@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from 'react'
+import {getCollection, addDocument, updateDocument, deleteDocument} from './actions'
+
 
 function App() {
 
@@ -13,25 +15,54 @@ const [pet, setPet] = useState({
   ownerEmail:''
 })
 
-const [Pets, setPets] = useState([])
+const [pets, setPets] = useState([])
 const [id, setId] = useState('')
 const [error, setError] = useState(null)
 
-console.log(pet)
-
-const enviarDatos = (event) => {
-  event.preventDefault()
-console.log(pet)
-
-}
 
 const handleInputChange = (event) => {
   setPet(({
     ...pet,
     [event.target.name] : event.target.value
-    
    }))
 }
+
+const enviarDatos = (event) => {
+  event.preventDefault()
+  setPets([...pets, {id:1, petName:pet.petName, petType:pet.petType, petRace:pet.petRace, petDateBirth:pet.petDateBirth, ownerFullName:pet.ownerFullName, ownerPhone:pet.ownerPhone, ownerAddress:pet.ownerAddress, ownerEmail:pet.ownerEmail}])
+  setPet({
+    petName:'',
+    petType:'',
+    petRace:'',
+    petDateBirth:'',
+    ownerFullName:'',
+    ownerPhone:0,
+    ownerAddress:'',
+    ownerEmail:''
+  })
+}
+
+const resetInput = () =>{
+  setPet({
+    petName:'',
+    petType:'',
+    petRace:'',
+    petDateBirth:'',
+    ownerFullName:'',
+    ownerPhone:0,
+    ownerAddress:'',
+    ownerEmail:''
+  })
+}
+
+useEffect(() => {
+  (async () => {
+    const result = await getCollection('pets')
+    if(result.statusResponse){
+      setPets(result.data)
+    }
+  })()
+}, [])
 
   return (
     <div className="container mt-5">
@@ -56,49 +87,49 @@ const handleInputChange = (event) => {
                   <div className="row">
                     <div className='col-6 mb-3'>
                       <label  className='form-label'><i className="far fa-address-book"></i> Nombre de la  mascota</label>
-                      <input type="text" className="form-control"onChange={handleInputChange} name='petName' placeholder="Ingrese nombre mascota" required />
+                      <input type="text" className="form-control"onChange={handleInputChange} name='petName' placeholder="Ingrese nombre mascota" value={pet.petName} required />
                     </div>
                       
                     <div className='col-6 mb-3'>
                       <label className='form-label'><i className="far fa-address-book"></i> Tipo de mascota</label>
-                      <input type="text" className="form-control" onChange={handleInputChange} name='petType' placeholder="Ingrese el tipo de mascota" required />
+                      <input type="text" className="form-control" onChange={handleInputChange} name='petType' placeholder="Ingrese el tipo de mascota"value={pet.petType} required />
                     </div>
 
                     <div className='col-6 mb-3'>
                       <label  className='form-label'><i className="fas fa-bullseye"></i> Raza</label>
-                      <input type="text" className="form-control"onChange={handleInputChange} name='petRace' placeholder="Ingrese la raza" required />
+                      <input type="text" className="form-control"onChange={handleInputChange} name='petRace' placeholder="Ingrese la raza" value={pet.petRace} required />
                     </div>
                       
                     <div className='col-6 mb-3'>
                       <label className='form-label'><i className="far fa-calendar-alt"></i> Fecha de nacimiento</label>
-                      <input type="date" className="form-control" onChange={handleInputChange} name='petDateBirth' placeholder="Ingrese la fecha de nacimiento de la mascota" required />
+                      <input type="date" className="form-control" onChange={handleInputChange} name='petDateBirth' placeholder="Ingrese la fecha de nacimiento de la mascota" value={pet.petDateBirth} required />
                     </div>
 
                     <div className='col-6 mb-3'>
                       <label  className='form-label'>Nombre y apellido propietario</label>
-                      <input type="text" className="form-control"onChange={handleInputChange} name='ownerFullName' placeholder="Ingrese nombre completo" required />
+                      <input type="text" className="form-control"onChange={handleInputChange} name='ownerFullName' placeholder="Ingrese nombre completo" value={pet.ownerFullName} required />
                     </div>
                       
                     <div className='col-6 mb-3'>
                       <label className='form-label'><i className="fas fa-phone"></i> Telefono del propietario</label>
-                      <input type="number" className="form-control" name='ownerPhone' onChange={handleInputChange} placeholder="Ingrese su telefono" required />
+                      <input type="number" className="form-control" name='ownerPhone' onChange={handleInputChange} placeholder="Ingrese su telefono" value={pet.ownerPhone} required />
                     </div>
 
                     <div className='col-6 mb-3'>
                       <label  className='form-label'><i className="fas fa-map-marked-alt"></i> Direccion del propietario</label>
-                      <input type="text" className="form-control" name='ownerAddress' onChange={handleInputChange} placeholder="Ingrese su direccion" required />
+                      <input type="text" className="form-control" name='ownerAddress' onChange={handleInputChange} placeholder="Ingrese su direccion" value={pet.ownerAddress} required />
                     </div>
                       
                     <div className='col-6 mb-3'>
                       <label className='form-label'><i className="fas fa-envelope"></i> Email del propietario</label>
-                      <input type="email" className="form-control" name='ownerEmail' onChange={handleInputChange} placeholder="Ingrese un email" required />
+                      <input type="email" className="form-control" name='ownerEmail' onChange={handleInputChange} placeholder="Ingrese un email" value={pet.ownerEmail} required />
                     </div>
                 </div>
                   
 
                   <div className="modal-footer mt-3">
-                    <button type="button" className="btn btn-danger rounded-circle" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" className="btn btn-success rounded-circle">Guardar</button>
+                    <button type="button" className="btn btn-danger rounded-circle" onClick={resetInput} data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" className="btn btn-success rounded-circle" >Guardar</button>
                   </div>
 
 
@@ -126,28 +157,25 @@ const handleInputChange = (event) => {
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th>michi</th>
-      <td>gato</td>
-      <td>Otro</td>
-      <td>10-08-1997</td>
-      <td>juan acevedo</td>
-      <td>321321234</td>
-      <td>cll 88 n 45 a 87</td>
-      <td>jua@gmail.com</td>
+
+    {
+      pets.map((pet)=>(
+
+    <tr key={pet.id}>
+      <td>{pet.petName}</td>
+      <td>{pet.petType}</td>
+      <td>{pet.petRace}</td>
+      <td>{pet.petDateBirth}</td>
+      <td>{pet.ownerFullName}</td>
+      <td>{pet.ownerPhone}</td>
+      <td>{pet.ownerAddress}</td>
+      <td>{pet.ownerEmail}</td>
       <td><button data-bs-toggle="modal" data-bs-target="#updatePatient" className='btn btn-primary rounded-circle'> <i className="far fa-edit"></i></button><button className='btn btn-danger rounded-circle' data-bs-toggle="modal" data-bs-target="#deletePatient"><i className="fas fa-trash-alt"></i></button> </td>
     </tr>
-    <tr>
-      <th>michi</th>
-      <td>gato</td>
-      <td>Otto</td>
-      <td>10-08-1997</td>
-      <td>juan acevedo</td>
-      <td>321321234</td>
-      <td>cll 88 n 45 a 87</td>
-      <td>jua@gmail.com</td>
-      <td><button className='btn btn-primary rounded-circle '><i className="far fa-edit"></i></button><button className='btn btn-danger rounded-circle '><i className="fas fa-trash-alt"></i></button> </td>
-    </tr>
+        
+      ))
+    }
+   
   </tbody>
 </table>
 <div className="modal fade" id="updatePatient" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
