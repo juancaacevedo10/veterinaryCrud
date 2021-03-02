@@ -157,7 +157,7 @@ function App() {
                   <div>
                     ¿Estas seguro que deseas eliminar este paciente?
                     <div className="modal-footer mt-3">
-                      <button type="button" className="btn btn-danger rounded-circle" onClick={handleClose} data-bs-dismiss="modal">No'</button>
+                      <button type="button" className="btn btn-danger rounded-circle" onClick={handleClose} data-bs-dismiss="modal">No</button>
                       <button type="button" className="btn btn-success rounded-circle" onClick={() => deletePets()} >Si</button>
                     </div>
                   </div>
